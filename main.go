@@ -118,7 +118,7 @@ func main() {
 	}
 
 	// изменение адреса
-	newAddress := "Саратов, д. Верхние Зори, ул. Козлова, д. 25"
+	newAddress := "Саратов, д. LOw Зори, ул. Козлова, д. 25"
 	err = service.ChangeAddress(p.Number, newAddress)
 	if err != nil {
 		fmt.Println(err)
@@ -150,6 +150,7 @@ func main() {
 	// предыдущая посылка не должна удалиться, т.к. её статус НЕ «зарегистрирована»
 	err = service.PrintClientParcels(client)
 	if err != nil {
+		fmt.Println(err)
 		fmt.Println(err)
 		return
 	}
