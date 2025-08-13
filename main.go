@@ -48,6 +48,7 @@ func (s ParcelService) Register(client int, address string) (Parcel, error) {
 	fmt.Printf("Новая посылка № %d на адрес %s от клиента с идентификатором %d зарегистрирована %s\n",
 		parcel.Number, parcel.Address, parcel.Client, parcel.CreatedAt)
 	fmt.Printf("Новпше згддая посылка еще")
+	fmt.Printf("aaaaaaaaaaaaaaaaaaaa")
 	return parcel, nil
 }
 
@@ -97,7 +98,7 @@ func (s ParcelService) Delete(number int) error {
 	return s.store.Delete(number)
 }
 
-func main() {
+func maain() {
 	db, err := sql.Open("sqlite", "tracker.db")
 	if err != nil {
 		fmt.Println(err)
