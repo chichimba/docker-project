@@ -1,8 +1,8 @@
 name: Security Review
 
 permissions:
-  pull-requests: write
-  contents: read
+  contents: read         # читать код
+  pull-requests: write   # писать комментарии в PR
 
 on:
   pull_request_target:
@@ -12,26 +12,38 @@ jobs:
   security:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      # 1) Чекаутим код ИМЕННО из ветки PR по SHA, но как "данные"
+      #    Важно: никаких скриптов из PR не запускать.
+      - name: Checkout PR HEAD (read-only)
+        uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          # репозиторий исходника PR (может быть форк)
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          # точный SHA коммита из PR
+          ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 2
+          # не подставлять креды базового репо к коду из форка
+          persist-credentials: false
+          # кладём код в подпапку, чтобы случайно не выполнить ничего из неё
+          path: pr-src
 
-      # (необязательно) префлайт-проверка ключа
+      # (Необязательно) префлайт — есть ли ключ
       - name: Preflight Anthropic key
         env:
-          ANTHROPIC_API_KEY: ${{ secrets.CLAUDE_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY || secrets.CLAUDE_API_KEY }}
         run: |
           test -n "$ANTHROPIC_API_KEY" || (echo "ANTHROPIC_API_KEY is empty"; exit 2)
           echo "Key present ✔"
 
+      # 2) Запускаем сканер. Он читает diff/файлы из ./pr-src
+      #    Важно: этот шаг НЕ должен выполнять произвольные скрипты из pr-src.
       - name: Run Claude Code Security Review
         uses: anthropics/claude-code-security-review@main
         with:
-          claude-api-key: ${{ secrets.CLAUDE_API_KEY }}   # input для самого action
+          claude-api-key: ${{ secrets.ANTHROPIC_API_KEY || secrets.CLAUDE_API_KEY }}
           comment-pr: true
           run-every-commit: true
           exclude-directories: "node_modules,dist,build,.next,venv,.venv,__pycache__"
         env:
-          # ⬅️ это важно: Claude Code CLI ждёт именно ANTHROPIC_API_KEY
-          ANTHROPIC_API_KEY: ${{ secrets.CLAUDE_API_KEY }}
+          # CLI ждёт именно это имя
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY || secrets.CLAUDE_API_KEY }}
