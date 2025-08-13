@@ -2,7 +2,7 @@ name: Security Review
 
 permissions:
   contents: read         # читать код
-  pull-requests: write   # писать комментарии в PR
+  pull-requests: write   
 
 on:
   pull_request_target:
