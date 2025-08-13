@@ -3,13 +3,13 @@
 package main
 
 import (
-	"crypto/md5"          // VULN: Weak hash for passwords
-	"crypto/tls"          // VULN: InsecureSkipVerify
-	"database/sql"        // VULN: Unsafe string-concatenated SQL
-	"fmt"                 // VULN: XSS via unescaped echo
+	"crypto/md5"   // VULN: Weak hash for passwords
+	"crypto/tls"   // VULN: InsecureSkipVerify
+	"database/sql" // VULN: Unsafe string-concatenated SQL
+	"fmt"          // VULN: XSS via unescaped echo
 	"net/http"
-	"os"                  // VULN: Overly permissive perms
-	"os/exec"             // VULN: Command injection
+	"os"      // VULN: Overly permissive perms
+	"os/exec" // VULN: Command injection
 )
 
 var (
